@@ -1,0 +1,68 @@
+<project name="Dashbaord Vagrant">
+
+	<property file="build.properties" />
+	<property file="opscode.properties" />
+	<property environment="env"/>
+
+	<property name="dir.base" location="." />
+	<property name="dir.vendor" location="${dir.base}/vendor" />
+	<property name="dir.opscode" location="${dir.vendor}/opscode/cookbooks" />
+
+	<available file="vagrant" filepath="${env.PATH}" property="cmd.vagrant.available" value="true" />
+
+
+
+
+	<!-- VALIDATE
+	all tasks you need to get started
+	-->
+	<target name="validate">
+		<fail unless="cmd.vagrant.available" message="`vagrant` not found! Please install - http://www.vagrantup.com/"/>
+
+		<!-- Check opscode cookbooks -->
+		<available file="${dir.opscode}/apache2" property="cookbooks.apache2.available" />
+		<antcall target="validate.cookbooks.apache2" />
+		<available file="${dir.opscode}/php" property="cookbooks.php.available" />
+		<antcall target="validate.cookbooks.php" />
+
+		<echo level="info">You are good to go. Just run: vagrant up</echo>
+	</target>
+
+	<!-- Cookbook: Apache2 -->
+	<target name="validate.cookbooks.apache2" unless="cookbooks.apache2.available">
+		<echo level="info">Downloading Apache2 cookbook</echo>
+
+		<mkdir dir="${dir.opscode}" />
+		<get dest="${dir.opscode}/${opscode.apache2.folder}.tar.gz" src="${opscode.apache2.url}"/>
+		<untar src="${dir.opscode}/${opscode.apache2.folder}.tar.gz" dest="${dir.opscode}" compression="gzip" />
+		<move file="${dir.opscode}/${opscode.apache2.folder}" tofile="${dir.opscode}/apache2" />
+	</target>
+
+	<!-- Cookbook: PHP -->
+	<target name="validate.cookbooks.php" unless="cookbooks.php.available">
+		<echo level="info">Downloading PHP cookbook</echo>
+
+		<mkdir dir="${dir.opscode}" />
+		<get dest="${dir.opscode}/${opscode.php.folder}.tar.gz" src="${opscode.php.url}"/>
+		<untar src="${dir.opscode}/${opscode.php.folder}.tar.gz" dest="${dir.opscode}" compression="gzip" />
+		<move file="${dir.opscode}/${opscode.php.folder}" tofile="${dir.opscode}/php" />
+	</target>
+
+
+
+
+	<!-- OTHER
+	everything else that I did not know how to group :)
+	-->
+	<target name="clear">
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="${dir.vendor}" defaultexcludes="false">
+				<include name="**"/>
+				<include name="**/.*"/>
+			</fileset>
+		</delete>
+
+		<!-- vagrant config file -->
+		<delete file="${dir.base}/VagrantConfig" />
+	</target>
+</project>
