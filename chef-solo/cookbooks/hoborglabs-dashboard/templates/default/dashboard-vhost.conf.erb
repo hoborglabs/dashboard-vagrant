@@ -1,0 +1,37 @@
+<VirtualHost *:<%= @params[:server_port] || node['apache']['listen_ports'].first %>>
+	ServerName <%= @params[:server_name] %>
+	ServerAlias <% @params[:server_aliases].each do |a| %><%= a %> <% end %>
+	DocumentRoot <%= @params[:docroot] %>/htdocs
+
+	<Directory <%= @params[:docroot] %>>
+		Options <%= [@params[:directory_options] || "FollowSymLinks" ].flatten.join " " %>
+		AllowOverride <%= [@params[:allow_override] || "None" ].flatten.join " " %>
+		Order allow,deny
+		Allow from all
+
+		<% if @params[:directory_index] -%>
+		DirectoryIndex <%= [@params[:directory_index]].flatten.join " " %>
+		<% end -%>
+
+		##
+		# Rewrite urls
+		RewriteEngine On
+
+		RewriteCond %{REQUEST_FILENAME} -s [OR]
+		RewriteCond %{REQUEST_FILENAME} -l [OR]
+		RewriteCond %{REQUEST_FILENAME} -d
+		RewriteRule ^.*$ - [NC,L]
+
+		RewriteRule ^.*/([^/]+)$ /index.php?conf=$1 [NC,L]
+	</Directory>
+
+	<Directory />
+		Options FollowSymLinks
+		AllowOverride None
+	</Directory>
+
+	LogLevel info
+	ErrorLog <%= node['apache']['log_dir'] %>/<%= @params[:name] %>-error.log
+	CustomLog <%= node['apache']['log_dir'] %>/<%= @params[:name] %>-access.log combined
+
+</VirtualHost>

@@ -17,8 +17,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 	# Create a forwarded port mapping which allows access to a specific port
 	# within the machine from a port on the host machine.
-	config.vm.network :forwarded_port, guest: 80, host: 8080
-	config.vm.network :forwarded_port, guest: 443, host: 8443
+	config.vm.network :forwarded_port, guest: 80, host: 7080
+	config.vm.network :forwarded_port, guest: 443, host: 7443
 
 	# get local config from VagrantConfig file
 	cfg = getConfig
@@ -45,7 +45,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 		chef.cookbooks_path = ["./chef-solo/cookbooks", "./vendor/opscode/cookbooks"]
 		chef.roles_path = "./chef-solo/roles"
-		chef.add_role "gamesys-dashboard"
+		chef.add_role "hoborglabs-dashboard"
 		chef.json = {
 			:user => {
 				:name => `whoami`.strip,
@@ -54,9 +54,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				:vimrc => readfile('~/.vimrc'),
 				:gitconfig => readfile('~/.gitconfig'),
 			},
-			:gamesys => {
+			:hoborglabs => {
 				:dashboard => {
-					:git_checkout => cfg[:git_checkout],
 					:git_config => cfg[:git_config]
 				}
 			}

@@ -48,9 +48,6 @@ def getConfig
 		getInput("How many cores?", localConfig, :cores, 1)
 		getInput("How much memory?", localConfig, :memory, 512)
 		getInput("Use (r)sa or (d)sa SSH key?", localConfig, :keyType, "r")
-		getInput("Set the codebase location", localConfig, :code_dashboard, "~/workspace/dashboard")
-		getInput("Set the codebase location", localConfig, :code_hack, "~/workspace/remote-dashing")
-		getYesNo("Do you want to checkout master branch?", localConfig, :git_checkout)
 		getYesNo("Do you want to copy ~/.gitconfig?", localConfig, :git_config)
 
 		file = File.open(fileName,'w')

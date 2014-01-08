@@ -1,0 +1,20 @@
+{
+	"name": "hoborglabs-dashboard",
+	"default_attributes": { },
+	"override_attributes": { },
+	"json_class": "Chef::Role",
+	"description": "Dashboard",
+	"chef_type": "role",
+	"run_list": [
+		"recipe[hoborglabs-dashboard]" 
+	],
+	"default_attributes": {
+		"apache": {
+			"default_modules": [
+				"status", "alias", "php5",
+				"auth_basic", "authn_file", "authz_default", "authz_groupfile", "authz_host", "authz_user",
+				"autoindex", "dir", "env", "mime", "negotiation", "setenvif"
+			]
+		}
+	}
+}

@@ -1,0 +1,18 @@
+## IDEs
+/.project
+/.settings
+/.buildpath
+
+
+
+
+## BUILD
+build.properties
+/vendor
+
+
+
+
+# Vagrant local files
+/.vagrant
+/VagrantConfig
