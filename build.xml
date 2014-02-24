@@ -20,32 +20,48 @@
 		<fail unless="cmd.vagrant.available" message="`vagrant` not found! Please install - http://www.vagrantup.com/"/>
 
 		<!-- Check opscode cookbooks -->
-		<available file="${dir.opscode}/apache2" property="cookbooks.apache2.available" />
-		<antcall target="validate.cookbooks.apache2" />
-		<available file="${dir.opscode}/php" property="cookbooks.php.available" />
-		<antcall target="validate.cookbooks.php" />
+		<validate-cookbook target="apache2"
+			folder="${opscode.apache2.folder}"
+			url="${opscode.apache2.url}"
+		/>
+		<validate-cookbook target="php"
+			folder="${opscode.php.folder}"
+			url="${opscode.php.url}"
+		/>
+		<validate-cookbook target="apt"
+			folder="${opscode.apt.folder}"
+			url="${opscode.apt.url}"
+		/>
+		<validate-cookbook target="nodejs"
+			folder="${opscode.nodejs.folder}"
+			url="${opscode.nodejs.url}"
+		/>
 
 		<echo level="info">You are good to go. Just run: vagrant up</echo>
 	</target>
 
-	<!-- Cookbook: Apache2 -->
-	<target name="validate.cookbooks.apache2" unless="cookbooks.apache2.available">
-		<echo level="info">Downloading Apache2 cookbook</echo>
+	<macrodef name="validate-cookbook">
+		<attribute name="target"/>
+		<attribute name="folder"/>
+		<attribute name="url"/>
+		<sequential>
+			<available file="${dir.opscode}/@{target}" property="cookbooks.@{target}.available" />
+			<echo level="info">Checking @{target} cookbook, [loaded = ${cookbooks.@{target}.available}]</echo>
+			<antcall target="-validate.cookbook">
+				<param name="cookbook" value="cookbooks.@{target}"/>
+				<param name="cookbook.folder" value="@{folder}"/>
+				<param name="cookbook.url" value="@{url}"/>
+				<param name="cookbook.target" value="@{target}"/>
+			</antcall>
+		</sequential>
+	</macrodef>
 
+	<target name="-validate.cookbook" unless="${cookbook}.available">
+		<echo level="info">Downloading ${cookbook.target} cookbook</echo>
 		<mkdir dir="${dir.opscode}" />
-		<get dest="${dir.opscode}/${opscode.apache2.folder}.tar.gz" src="${opscode.apache2.url}"/>
-		<untar src="${dir.opscode}/${opscode.apache2.folder}.tar.gz" dest="${dir.opscode}" compression="gzip" />
-		<move file="${dir.opscode}/${opscode.apache2.folder}" tofile="${dir.opscode}/apache2" />
-	</target>
-
-	<!-- Cookbook: PHP -->
-	<target name="validate.cookbooks.php" unless="cookbooks.php.available">
-		<echo level="info">Downloading PHP cookbook</echo>
-
-		<mkdir dir="${dir.opscode}" />
-		<get dest="${dir.opscode}/${opscode.php.folder}.tar.gz" src="${opscode.php.url}"/>
-		<untar src="${dir.opscode}/${opscode.php.folder}.tar.gz" dest="${dir.opscode}" compression="gzip" />
-		<move file="${dir.opscode}/${opscode.php.folder}" tofile="${dir.opscode}/php" />
+		<get dest="${dir.opscode}/${cookbook.folder}.tar.gz" src="${cookbook.url}"/>
+		<untar src="${dir.opscode}/${cookbook.folder}.tar.gz" dest="${dir.opscode}" compression="gzip" />
+		<move file="${dir.opscode}/${cookbook.folder}" tofile="${dir.opscode}/${cookbook.target}" />
 	</target>
 
 

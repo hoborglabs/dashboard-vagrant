@@ -6,7 +6,9 @@
 	"description": "Dashboard",
 	"chef_type": "role",
 	"run_list": [
-		"recipe[hoborglabs-dashboard]" 
+		"recipe[apt]",
+		"recipe[nodejs::install_from_package]",
+		"recipe[hoborglabs-dashboard]"
 	],
 	"default_attributes": {
 		"apache": {

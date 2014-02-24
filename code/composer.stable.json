@@ -1,0 +1,7 @@
+{
+    "require": {
+        "php": ">=5.3.0",
+        "hoborglabs/dashboard": ">1@stable",
+        "hoborglabs/widgets": ">1@stable"
+    }
+}

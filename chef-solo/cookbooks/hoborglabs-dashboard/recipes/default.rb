@@ -3,12 +3,6 @@
 # Recipe:: default
 #
 
-# make sure we have up to date apt
-execute "apt-get-update" do
-  command "apt-get update"
-  ignore_failure true
-end
-
 # make sure some useful tools are installed
 %w[curl].each do |pkg|
 	package pkg do

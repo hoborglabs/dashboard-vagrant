@@ -5,7 +5,7 @@
 VAGRANTFILE_API_VERSION = "2"
 
 # include some helpers
-require File.expand_path('../vagrant-helpers', __FILE__)
+require File.expand_path('../vagrant/config', __FILE__)
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# Every Vagrant virtual environment requires a box to build off of.
@@ -15,13 +15,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# doesn't already exist on the user's system.
 	config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
-	# Create a forwarded port mapping which allows access to a specific port
-	# within the machine from a port on the host machine.
-	config.vm.network :forwarded_port, guest: 80, host: 7080
-	config.vm.network :forwarded_port, guest: 443, host: 7443
-
 	# get local config from VagrantConfig file
 	cfg = getConfig
+
+	# Create a forwarded port mapping which allows access to a specific port
+	# within the machine from a port on the host machine.
+	config.vm.network :forwarded_port, guest: 80, host: cfg[:portOffset] + 80
+	config.vm.network :forwarded_port, guest: 443, host: cfg[:portOffset] + 443
 
 	# Provider-specific configuration so you can fine-tune various
 	# backing providers for Vagrant.
@@ -31,37 +31,29 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	end
 
 	# add shared folder
-	content = location(:code_dashboard, "~/workspace/dashboard/")
-	config.vm.synced_folder content, "/var/code/dashboard"
-	hack_rc = location(:code_hack, "~/workspace/remote-dashing/")
-	config.vm.synced_folder hack_rc, "/var/code/remote-dashing"
+	config.vm.synced_folder(
+			location(cfg[:code_dashboard] || "~/workspace/dashboard/"),
+			"/var/code/dashboard")
 
 	# Enable provisioning with chef solo, specifying a cookbooks path, roles
 	# path, and data_bags path (all relative to this Vagrantfile), and adding
 	# some recipes and/or roles.
 	config.vm.provision :chef_solo do |chef|
-		# different machines, different ssh key names
-		key_type = cfg[:keyType].nil? ? "r" : cfg[:keyType]
-
 		chef.cookbooks_path = ["./chef-solo/cookbooks", "./vendor/opscode/cookbooks"]
 		chef.roles_path = "./chef-solo/roles"
 		chef.add_role "hoborglabs-dashboard"
 		chef.json = {
-			:user => {
-				:name => `whoami`.strip,
-				:public_key => readfile('~/.ssh/id_' + key_type + 'sa.pub'),
-				:private_key => readfile('~/.ssh/id_' + key_type + 'sa'),
-				:vimrc => readfile('~/.vimrc'),
-				:gitconfig => readfile('~/.gitconfig'),
-			},
 			:hoborglabs => {
+				:user => {
+					:name => `whoami`.strip,
+					:public_key => readfile(cfg[:sshKey] + '.pub'),
+					:private_key => readfile(cfg[:sshKey]),
+					:vimrc => cfg[:vim_config] ? readfile('~/.vimrc') : nill,
+					:gitconfig => cfg[:git_config] ? readfile('~/.gitconfig') : nill,
+				},
 				:dashboard => {
-					:git_config => cfg[:git_config]
 				}
 			}
 		}
 	end
 end
-
-
-
