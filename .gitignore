@@ -1,18 +1,26 @@
+## BUILD
+build.properties
+/vendor
+/code/vendor/*
+/code/composer.*
+
+
+
+
+## Vagrant
+# local files and configs
+/.vagrant
+/VagrantConfig
+
+
+
+
 ## IDEs
 /.project
 /.settings
 /.buildpath
+*.swp
 
 
 
 
-## BUILD
-build.properties
-/vendor
-
-
-
-
-# Vagrant local files
-/.vagrant
-/VagrantConfig
