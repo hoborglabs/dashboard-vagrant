@@ -89,6 +89,14 @@
 			resource="../../../vendor/hoborglabs/dashboard/build/dist/htdocs/static/styles/hoborglabs"
 			overwrite="yes"
 		/>
+
+		<!-- symlink images -->
+		<mkdir dir="${dir.htdocs}/static/images" />
+		<echo level="info">Setting up hoborglabs images</echo>
+		<symlink link="${dir.htdocs}/static/images/hoborglabs"
+			resource="../../../vendor/hoborglabs/dashboard/htdocs/images"
+			overwrite="yes"
+		/>
 	</target>
 
 	<!-- trys to install composer locally using composer's install script -->

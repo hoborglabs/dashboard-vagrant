@@ -2,6 +2,7 @@
 build.properties
 /vendor
 /code/vendor/*
+/code/htdocs/static/*
 /code/composer.*
 
 
