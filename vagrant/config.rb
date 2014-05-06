@@ -2,7 +2,7 @@ require 'json'
 
 def getConfig
 	@localConfig ||= begin
-		fileName = '../VagrantConfig'
+		fileName = configFile()
 		JSON.parse(readfile(fileName), :symbolize_names => true)
 	rescue
 		localConfig = Hash.new
@@ -12,9 +12,11 @@ def getConfig
 		getInput("How much memory?", localConfig, :memory, 512)
 		getInputNumber("Port Offset?", localConfig, :portOffset, 4000)
 
-		getInput("Which ssh key to use?", localConfig, :sshKey, "~/.ssh/vagrant_rsa")
+		# Find out if there is 'vagrant_rsa' key available.
+		keyFile = File.exists?("~/.ssh/vagrant_rsa") ? "~/.ssh/vagrant_rsa" : "~/.ssh/id_rsa"
+		getInput("Which ssh key to use?", localConfig, :sshKey, keyFile)
+
 		getInput("Set the codebase location", localConfig, :code_dashboard, "~/workspace/dashboard")
-		getYesNo("Do you want to checkout master branch?", localConfig, :git_checkout, 'y')
 		getYesNo("Do you want to copy ~/.gitconfig?", localConfig, :git_config, 'y')
 		getYesNo("Do you want to copy ~/.vimrc?", localConfig, :vim_config, 'y')
 
@@ -65,7 +67,7 @@ def getYesNo(prompt, config, key, default = nil)
 			print "#{prompt} [Y/n]: "
 		elsif default == 'n'
 			print "#{prompt} [y/N]: "
-		else 
+		else
 			print "#{prompt} [y/n]: "
 		end
 
@@ -87,7 +89,7 @@ def getYesNo(prompt, config, key, default = nil)
 end
 
 ##
-# return full path for 
+# return full path for
 def location(dir)
 	dir = File.expand_path(dir)
 	if !File.directory? dir

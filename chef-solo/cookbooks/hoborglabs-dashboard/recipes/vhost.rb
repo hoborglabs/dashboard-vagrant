@@ -14,10 +14,9 @@ end
 
 # add apache vhost for dashboard
 web_app "dashboard" do
-	server_name "dashboard.dev"
-	server_aliases ["www.dashboard.dev"]
-	directory_index ["index.php"]
-	docroot node[:hoborglabs_dashboard][:vhost_folder]
+	server_name node['hoborglabs-dashboard'][:vhost][:server_name]
+	server_aliases node['hoborglabs-dashboard'][:vhost][:server_aliases]
+	docroot "/var/www/vhost/#{node['hoborglabs-dashboard'][:vhost][:server_name]}"
 	directory_index "index.php"
 	template "dashboard-vhost.conf.erb"
 end

@@ -3,7 +3,11 @@
 # Attributes:: hoborglabs_dashboard
 
 
-default['hoborglabs_dashboard'] = { 
-	:code_folder => '/vagrant/code',
-	:vhost_folder => '/var/www/vhost/dashboard.dev',
+default['hoborglabs-dashboard'] = {
+	:code_root => '/var/code/',
+	:version => 'master',
+	:vhost => {
+		:server_name => 'dashboard.dev',
+		:server_aliases => ['www.dashboard.dev'],
+	}
 }

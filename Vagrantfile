@@ -9,11 +9,12 @@ require File.expand_path('../vagrant/config', __FILE__)
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# Every Vagrant virtual environment requires a box to build off of.
-	config.vm.box = "precise64"
+	config.vm.box = "CentOS 6.4 x86_64"
 
 	# The url from where the 'config.vm.box' box will be fetched if it
 	# doesn't already exist on the user's system.
-	config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+	#config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+	config.vm.box_url = "http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20131103.box"
 
 	# get local config from VagrantConfig file
 	cfg = getConfig
@@ -39,7 +40,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# path, and data_bags path (all relative to this Vagrantfile), and adding
 	# some recipes and/or roles.
 	config.vm.provision :chef_solo do |chef|
-		chef.cookbooks_path = ["./chef-solo/cookbooks", "./vendor/opscode/cookbooks"]
+		chef.cookbooks_path = ["./chef-solo/cookbooks", "./opscode/cookbooks"]
 		chef.roles_path = "./chef-solo/roles"
 		chef.add_role "hoborglabs-dashboard"
 		chef.json = {
@@ -56,4 +57,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			}
 		}
 	end
+end
+
+# used by ./vagrant/config.rb to get config file name
+def configFile()
+	File.expand_path('VagrantConfig')
 end
