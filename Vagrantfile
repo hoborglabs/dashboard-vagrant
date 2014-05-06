@@ -34,7 +34,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# add shared folder
 	config.vm.synced_folder(
 			location(cfg[:code_dashboard] || "~/workspace/dashboard/"),
-			"/var/code/dashboard")
+			"/var/code/example")
 
 	# Enable provisioning with chef solo, specifying a cookbooks path, roles
 	# path, and data_bags path (all relative to this Vagrantfile), and adding
