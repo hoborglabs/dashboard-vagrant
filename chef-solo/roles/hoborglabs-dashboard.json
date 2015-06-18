@@ -1,6 +1,5 @@
 {
 	"name": "hoborglabs-dashboard",
-	"default_attributes": { },
 	"override_attributes": { },
 	"json_class": "Chef::Role",
 	"description": "Dashboard",

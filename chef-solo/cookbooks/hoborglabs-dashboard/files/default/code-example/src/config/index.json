@@ -1,0 +1,21 @@
+{
+	"template": "hoborg-dev",
+	"publicPrefix": "",
+	"widgets": [
+		{
+			"name": "List of all dashboards",
+			"size": "grid-hh-1-1 grid-tb-1-1 grid-ds-1-1 grid-tv-1-1",
+			"php": "Hoborg/Widget/Index.php"
+		},
+		{
+			"name": "Welcome to demo Dashboard.",
+			"static": "hoborg/intro.html",
+			"size": "grid-hh-1-1 grid-tb-1-1 grid-ds-1-2 grid-tv-1-2"
+		},
+		{
+			"name": "Welcome to demo Dashboard.",
+			"static": "hoborg/intro.html",
+			"size": "grid-hh-1-1 grid-tb-1-1 grid-ds-1-2 grid-tv-1-2"
+		}
+	]
+}

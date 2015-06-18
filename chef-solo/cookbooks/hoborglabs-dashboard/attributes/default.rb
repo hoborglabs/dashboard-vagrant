@@ -5,9 +5,12 @@
 
 default['hoborglabs-dashboard'] = {
 	:code_root => '/var/code/',
-	:version => 'master',
 	:vhost => {
 		:server_name => 'dashboard.dev',
 		:server_aliases => ['www.dashboard.dev'],
+	}
+	:git => {
+		:revision => 'develop',
+		:remote => 'git@github.com:hoborglabs/dashboard.git'
 	}
 }

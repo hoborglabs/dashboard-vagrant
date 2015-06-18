@@ -2,27 +2,28 @@
 # Cookbook Name:: hoborglabs-dashboard
 # Recipe:: code
 #
-# This checkots code for dashboard
+# This checkots example project for dashboard ready for use
 
 # make sure some useful tools are installed
 basePackages = %w[ git ant vim curl ]
 case node['platform_family']
-when 'rhel'
-	# this is for ant symlink task
-	basePackages << "ant-nodeps"
-end
-basePackages.each do |pkg|
-	package pkg do
-		action :install
-	end
+	when 'rhel'
+		# this is for ant symlink task
+		basePackages << "ant-nodeps"
 end
 
-directory "#{node['hoborglabs-dashboard'][:code_root]}/example" do
+basePackages.each do |pkg|
+	package pkg
+end
+
+codeRoot = node['hoborglabs-dashboard'][:code_root]
+
+directory "#{codeRoot}/example-app" do
 	recursive true
 	action :create
 end
 
-remote_directory "#{node['hoborglabs-dashboard'][:code_root]}/example" do
+remote_directory "#{codeRoot}/example-app" do
 	source 'code-example'
 	recursive true
 	action :create
@@ -32,21 +33,21 @@ end
 # run as root, dashboard build.xml executes another ant for vendor/hoborglabs/dashbaord
 # and for some reason the inner ant call thinks it's executed by root
 execute "dashboard_validate" do
-	cwd "#{node['hoborglabs-dashboard'][:code_root]}/example"
-	command "ant validate.dev"
-	only_if { ::File.exists?("#{node['hoborglabs-dashboard'][:code_root]}/example/build.xml") }
+	cwd "#{codeRoot}/example-app"
+	command "ant validate"
+	only_if { ::File.exists?("#{codeRoot}/example-app/build.xml") }
 end
 
-execute "chgrp to apache2 group" do
-	command "chgrp -R #{node['apache']['group']} #{node['hoborglabs-dashboard'][:code_root]}/example"
+execute "fix_group" do
+	command "chgrp -R '#{node['apache']['group']}' '#{codeRoot}/example-app'"
 end
 
-
-link "#{node['hoborglabs-dashboard'][:code_root]}/current" do
-	to "#{node['hoborglabs-dashboard'][:code_root]}/example"
+# link current version
+link "#{codeRoot}/#{node['hoborglabs-dashboard'][:vhost][:server_name]}" do
+	to "#{codeRoot}/example-app"
 end
 
-# add symlink for vhost
+# connect to apache vhost
 link "/var/www/vhost/#{node['hoborglabs-dashboard'][:vhost][:server_name]}" do
-	to "#{node['hoborglabs-dashboard'][:code_root]}/current"
+	to "#{codeRoot}/#{node['hoborglabs-dashboard'][:vhost][:server_name]}"
 end

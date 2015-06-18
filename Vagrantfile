@@ -9,12 +9,12 @@ require File.expand_path('../vagrant/config', __FILE__)
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# Every Vagrant virtual environment requires a box to build off of.
-	config.vm.box = "CentOS 6.4 x86_64"
+	config.vm.box = "chef/centos-6.5"
 
 	# The url from where the 'config.vm.box' box will be fetched if it
 	# doesn't already exist on the user's system.
 	#config.vm.box_url = "http://files.vagrantup.com/precise64.box"
-	config.vm.box_url = "http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20131103.box"
+	#config.vm.box_url = "http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20131103.box"
 
 	# get local config from VagrantConfig file
 	cfg = getConfig
@@ -34,7 +34,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# add shared folder
 	config.vm.synced_folder(
 			location(cfg[:code_dashboard] || "~/workspace/dashboard/"),
-			"/var/code/example")
+			"/var/code/")
 
 	# Enable provisioning with chef solo, specifying a cookbooks path, roles
 	# path, and data_bags path (all relative to this Vagrantfile), and adding

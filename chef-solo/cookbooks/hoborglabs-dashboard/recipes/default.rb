@@ -3,13 +3,6 @@
 # Recipe:: default
 #
 
-# make sure some useful tools are installed
-%w[ curl ].each do |pkg|
-	package pkg do
-		action :install
-	end
-end
-
 # Add additional packages.
 case node['platform_family']
 when 'debian'
@@ -23,5 +16,5 @@ include_recipe "php"
 include_recipe "hoborglabs-dashboard::vhost"
 include_recipe "hoborglabs-dashboard::code"
 
-
+# Open HTTP ports
 iptables_rule "http"
