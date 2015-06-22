@@ -1,0 +1,7 @@
+---
+
+- name: Vagrant Setup
+  hosts: default
+
+- name: Dashboard
+  include: ansible/playbooks/dashboard.yml

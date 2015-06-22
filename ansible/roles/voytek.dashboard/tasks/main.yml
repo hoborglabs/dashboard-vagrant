@@ -1,0 +1,21 @@
+---
+
+- name: Copy base
+  copy:
+    src: code/
+    dest: "{{ voytek.dashboard.root }}"
+
+- name: Install Dependencies
+  sudo: yes
+  apt-get:
+    name: "{{ item }}"
+  with_items:
+    - ant
+    - nodejs
+    - npm
+    - php
+
+- name: Build the app
+  command: "ant validate"
+  args:
+    chdir: "{{ voytek.dashboard.root }}"

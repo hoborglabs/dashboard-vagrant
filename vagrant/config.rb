@@ -1,31 +1,27 @@
 require 'json'
 
-def getConfig
-	@localConfig ||= begin
-		fileName = configFile()
+def getConfig()
+	fileName = getConfigFolder() + "/vagrant.json"
+
+	localConfig ||= begin
 		JSON.parse(readfile(fileName), :symbolize_names => true)
 	rescue
-		localConfig = Hash.new
-		localConfig[:git_checkout] = 0
-
-		getInput("How many cores?", localConfig, :cores, 1)
-		getInput("How much memory?", localConfig, :memory, 512)
-		getInputNumber("Port Offset?", localConfig, :portOffset, 4000)
-
-		# Find out if there is 'vagrant_rsa' key available.
-		keyFile = File.exists?("~/.ssh/vagrant_rsa") ? "~/.ssh/vagrant_rsa" : "~/.ssh/id_rsa"
-		getInput("Which ssh key to use?", localConfig, :sshKey, keyFile)
-
-		getInput("Set the codebase location", localConfig, :code_dashboard, "~/workspace/dashboard")
-		getYesNo("Do you want to copy ~/.gitconfig?", localConfig, :git_config, 'y')
-		getYesNo("Do you want to copy ~/.vimrc?", localConfig, :vim_config, 'y')
-
-		file = File.open(fileName,'w')
-		file.write(JSON.dump(localConfig))
-		file.close
-
-		localConfig
+		localConfig ||= begin
+			JSON.parse(readfile(getConfigFolder() + "/vagrant.base.json"), :symbolize_names => true)
+		rescue
+			localConfig = Hash.new
+		end
 	end
+
+	# This function needs to be defined in your  Vagrantfile
+	# We will call it every time to make sure we have all latest options
+	configSetup(localConfig)
+
+	file = File.open(fileName,'w')
+	file.write(JSON.pretty_generate(localConfig))
+	file.close
+
+	localConfig
 end
 
 # Read a file, returning nil if it doesn't exist
@@ -36,31 +32,48 @@ rescue
 	nil
 end
 
-def getInput(prompt, config, key, default=nil)
+def getInput(prompt, config, key, default=nil, description=nil)
+	if config.key?(key)
+		return
+	end
+
+	prompt = "#{prompt}\n#{description}\n   " if description
 	prompt = "#{prompt} [#{default}]" if default
-	print "#{prompt}: "
+	print " o  #{prompt}: "
 	input = STDIN.gets.strip
+
 	if input.empty? and default
 		input = default
 	elsif input.empty?
 		raise "Field is required, try again"
 	end
+
 	config[key] = input
 end
 
 def getInputNumber(prompt, config, key, default=nil)
+	if config.key?(key)
+		return
+	end
+
 	prompt = "#{prompt} [#{default}]" if default
 	print "#{prompt}: "
 	input = STDIN.gets.strip
+
 	if input.empty? and default
 		input = default
 	elsif input.empty?
 		raise "Field is required, try again"
 	end
+
 	config[key] = input.to_i
 end
 
 def getYesNo(prompt, config, key, default = nil)
+	if config.key?(key)
+		return
+	end
+
 	yesNo = nil
 	while yesNo.nil?
 		if default == 'y'
@@ -86,6 +99,31 @@ def getYesNo(prompt, config, key, default = nil)
 	end
 
 	config[key] = yesNo
+end
+
+def getOption(prompt, config, key, options)
+	if config.key?(key)
+		return
+	end
+
+	selectedOption = nil
+
+	print "#{prompt}\n"
+	while selectedOption.nil?
+		options.each_index do |optionIndex|
+			print "  #{optionIndex} - #{options[optionIndex][:text]}\n"
+		end
+		print "please select number 0 .. #{options.length - 1}: "
+
+		input = STDIN.gets.strip
+		selectedOption = input.to_i
+
+		if selectedOption > options.length
+			selectedOption = nil
+		end
+	end
+
+	config[key] = options[selectedOption][:value]
 end
 
 ##

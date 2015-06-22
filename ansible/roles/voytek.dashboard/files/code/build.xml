@@ -1,0 +1,130 @@
+<project name="Gamesys Dashboard">
+
+	<!-- optional environmental settings -->
+	<property file="build.properties" />
+
+	<!-- setup default values -->
+	<property name="dir.base" location="." />
+	<property name="dir.htdocs" location="${dir.base}/htdocs" />
+	<property name="dir.vendor" location="${dir.base}/vendor" />
+
+	<property name="cmd.php" value="php" />
+	<property name="cmd.composer" value="${dir.base}/composer.phar" />
+	<property name="cmd.ant" value="ant" />
+
+	<available file="${cmd.composer}" property="composer.present" />
+
+
+
+
+	<!-- VALIDATE
+	all targets needed to set up your env
+	-->
+	<target name="validate"
+		description="Validates project for production."
+		depends="-install-composer"
+	>
+		<!-- get dependencies -->
+		<copy file="${dir.base}/composer.stable.json" tofile="${dir.base}/composer.json" />
+		<exec executable="${cmd.php}" failonerror="true">
+			<arg line="-d detect_unicode=Off" />
+			<arg line="-d apc.enable_cli=Off" />
+			<arg line="${cmd.composer}" />
+			<arg line="--no-dev" />
+			<arg line="--no-interaction" />
+			<arg line="--prefer-dist" />
+			<arg line="update" />
+		</exec>
+
+		<antcall target="validate.assets" />
+	</target>
+
+	<target name="validate.dev"
+		description="Validates project for development."
+		depends="-install-composer"
+	>
+		<!-- get dependencies -->
+		<copy file="${dir.base}/composer.dev.json" tofile="${dir.base}/composer.json" />
+		<exec executable="${cmd.php}" failonerror="true">
+			<arg line="-d detect_unicode=Off" />
+			<arg line="-d apc.enable_cli=Off" />
+			<arg line="${cmd.composer}" />
+			<arg line="update" />
+		</exec>
+
+		<antcall target="validate.assets" />
+
+		<!-- symlink DEV resources -->
+		<symlink link="${dir.htdocs}/static/scripts/hoborglabs-dev"
+			resource="../../../vendor/hoborglabs/dashboard/scripts"
+			overwrite="yes"
+		/>
+		<symlink link="${dir.htdocs}/static/styles/hoborglabs-dev"
+			resource="../../../vendor/hoborglabs/dashboard/styles"
+			overwrite="yes"
+		/>
+	</target>
+
+	<target name="validate.assets"
+		description="Validates assets."
+	>
+		<!-- build assets -->
+		<echo level="info">Building Dashboard assets</echo>
+		<exec executable="${cmd.ant}" dir="${dir.base}/vendor/hoborglabs/dashboard" failonerror="true">
+			<arg line="build.js build.css" />
+		</exec>
+
+		<!-- symlink JS -->
+		<echo level="info">Setting up hoborglabs scripts</echo>
+		<mkdir dir="${dir.htdocs}/static/scripts" />
+		<symlink link="${dir.htdocs}/static/scripts/hoborglabs"
+			resource="../../../vendor/hoborglabs/dashboard/dist/public/static/scripts/hoborglabs"
+			overwrite="yes"
+		/>
+
+		<!-- symlink CSS/LESS -->
+		<mkdir dir="${dir.htdocs}/static/styles" />
+		<echo level="info">Setting up hoborglabs styles</echo>
+		<symlink link="${dir.htdocs}/static/styles/hoborglabs"
+			resource="../../../vendor/hoborglabs/dashboard/dist/public/static/styles/hoborglabs"
+			overwrite="yes"
+		/>
+
+		<!-- symlink images -->
+		<mkdir dir="${dir.htdocs}/static/images" />
+		<echo level="info">Setting up hoborglabs images</echo>
+		<symlink link="${dir.htdocs}/static/images/hoborglabs"
+			resource="../../../vendor/hoborglabs/dashboard/htdocs/images"
+			overwrite="yes"
+		/>
+	</target>
+
+	<!-- trys to install composer locally using composer's install script -->
+	<target name="-install-composer" unless="composer.present">
+		<exec executable="${cmd.php}" failonerror="true">
+			<arg line="-d detect_unicode=Off" />
+			<arg line="-d apc.enable_cli=Off" />
+			<arg value="-r" />
+			<arg value="eval('?>'.file_get_contents('https://getcomposer.org/installer'));" />
+		</exec>
+	</target>
+
+
+
+
+	<!-- OTHER
+	everything else that I did not know how to group :)
+	-->
+	<target name="clear">
+		<delete includeemptydirs="true">
+			<fileset dir="${dir.vendor}" defaultexcludes="false">
+				<include name="**"/>
+			</fileset>
+		</delete>
+
+		<!-- composer files -->
+		<delete file="${dir.base}/composer.json" />
+		<delete file="${dir.base}/composer.lock" />
+		<delete file="${dir.base}/composer.phar" />
+	</target>
+</project>

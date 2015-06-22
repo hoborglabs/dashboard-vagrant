@@ -1,27 +1,17 @@
-## BUILD
-build.properties
-/vendor
-/code/vendor/*
-/code/htdocs/static/*
-/code/composer.*
-
-
-
-
-## Vagrant
-# local files and configs
-/.vagrant
-/VagrantConfig
-
-
-
-
-## IDEs
-/.project
-/.settings
-/.buildpath
+# IDEs etc
 *.swp
+*.sublime*
+.idea
+*.iml
+.boto
+.DS_Store
+.project
+/.settings
 
 
 
 
+# Vagrant, build, etc
+/machines/*/vagrant.json
+/machines/*/.vagrant
+/secrets.yml

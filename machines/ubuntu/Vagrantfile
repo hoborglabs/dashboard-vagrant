@@ -1,0 +1,55 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+# include some helpers
+rootDir = File.expand_path('../../')
+require "#{rootDir}/vagrant/config.rb"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+	cfg = getConfig()
+
+	config.vm.box = "ubuntu/trusty64"
+	config.vm.box_check_update = false
+
+	config.ssh.forward_agent = true
+
+	# port forwarding
+	config.vm.network :forwarded_port, guest: 80, host: cfg[:portOffset] + 80
+
+	config.vm.provider :virtualbox do |vb|
+		vb.customize ["modifyvm", :id, "--memory", cfg[:memory]]
+		vb.customize ["modifyvm", :id, "--cpus", cfg[:cores]]
+
+		vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+		vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+	end
+
+	config.vm.provision "ansible" do |ansible|
+		ansible.playbook = "provision.yml"
+		ansible.verbose = "#{ENV['VERBOSE']}" if ENV['VERBOSE']
+		ansible.extra_vars = {
+			'hosts' => 'default',
+		}
+	end
+
+end
+
+def configSetup(cfg)
+	getInput("How many cores?", cfg, :cores, 1)
+	getInput("How much memory?", cfg, :memory, 1024)
+	getInputNumber("Port Offset?", cfg, :portOffset, 8000)
+
+	getInput("Set the codebase location", cfg, :code_dashboard, "~/workspace/dashboard")
+	getYesNo("Do you want to copy ~/.gitconfig?", cfg, :git_config, 'y')
+	getYesNo("Do you want to copy ~/.vimrc?", cfg, :vim_config, 'y')
+end
+
+# used by ./vagrant/config.rb to get config file name
+# This is relative to the folder from where you run `vagrant up`
+def getConfigFolder()
+	File.expand_path('.')
+end
