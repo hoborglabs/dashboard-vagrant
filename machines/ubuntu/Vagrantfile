@@ -7,6 +7,7 @@ VAGRANTFILE_API_VERSION = "2"
 # include some helpers
 rootDir = File.expand_path('../../')
 require "#{rootDir}/vagrant/config.rb"
+require "#{rootDir}/vagrant/shame.rb"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
@@ -19,6 +20,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 	# port forwarding
 	config.vm.network :forwarded_port, guest: 80, host: cfg[:portOffset] + 80
+
+	config.vm.synced_folder ensureDir("#{cfg[:code_dashboard]}/"), "/home/vagrant/code",
+		mount_options: ["dmode=777,fmode=777"]
 
 	config.vm.provider :virtualbox do |vb|
 		vb.customize ["modifyvm", :id, "--memory", cfg[:memory]]

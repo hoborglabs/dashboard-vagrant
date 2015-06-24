@@ -7,13 +7,13 @@
 
 - name: Install Dependencies
   sudo: yes
-  apt-get:
+  apt:
     name: "{{ item }}"
   with_items:
     - ant
     - nodejs
     - npm
-    - php
+    - php5
 
 - name: Build the app
   command: "ant validate"

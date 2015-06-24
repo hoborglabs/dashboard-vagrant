@@ -71,14 +71,14 @@
 		<!-- build assets -->
 		<echo level="info">Building Dashboard assets</echo>
 		<exec executable="${cmd.ant}" dir="${dir.base}/vendor/hoborglabs/dashboard" failonerror="true">
-			<arg line="build.js build.css.compress build.css.gfx" />
+			<arg line="build.js build.css" />
 		</exec>
 
 		<!-- symlink JS -->
 		<echo level="info">Setting up hoborglabs scripts</echo>
 		<mkdir dir="${dir.htdocs}/static/scripts" />
-		<symlink link="${dir.htdocs}/static/scripts/hoborglabs" 
-			resource="../../../vendor/hoborglabs/dashboard/build/dist/htdocs/static/scripts/hoborglabs"
+		<symlink link="${dir.htdocs}/static/scripts/hoborglabs"
+			resource="../../../vendor/hoborglabs/dashboard/dist/public/static/scripts/hoborglabs"
 			overwrite="yes"
 		/>
 
@@ -86,7 +86,7 @@
 		<mkdir dir="${dir.htdocs}/static/styles" />
 		<echo level="info">Setting up hoborglabs styles</echo>
 		<symlink link="${dir.htdocs}/static/styles/hoborglabs"
-			resource="../../../vendor/hoborglabs/dashboard/build/dist/htdocs/static/styles/hoborglabs"
+			resource="../../../vendor/hoborglabs/dashboard/dist/public/static/styles/hoborglabs"
 			overwrite="yes"
 		/>
 
